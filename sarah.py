@@ -13,7 +13,6 @@ from collections import deque
 from datetime import datetime, timedelta, timezone
 from discord.ext import tasks
 import pytz
-
 # --- CONFIGURAÇÃO ---
 load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
@@ -30,7 +29,6 @@ SELF_INITIATED_COOLDOWN_SECONDS = 3600 * 4
 MAIN_MODEL = "google/gemma-3-27b-it:free"
 PROACTIVE_MODELS = ["google/gemma-3-27b-it:free"]
 GEMINI_BACKUP_MODEL = "gemini-2.0-flash"
-
 # --- SYSTEM PROMPTS ---
 SYSTEM_PROMPT = """
 ### **1. Identidade Principal**
@@ -375,14 +373,12 @@ try:
     print("Cliente Gemini inicializado com sucesso")
 except Exception as e:
     print(f"Erro ao inicializar o cliente Gemini: {e}")
-
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
 intents.guilds = True
 client = discord.Client(intents=intents)
 brasilia_tz = pytz.timezone('America/Sao_Paulo')
-
 async def get_openrouter_response(messages, model=MAIN_MODEL, temperature=0.8, max_tokens=1024):
     """Faz requisição para OpenRouter API"""
     try:
@@ -406,7 +402,6 @@ async def get_openrouter_response(messages, model=MAIN_MODEL, temperature=0.8, m
     except Exception as e:
         print(f"Erro na API OpenRouter (modelo: {model}): {e}")
         raise e
-
 async def get_gemini_response(messages, model=GEMINI_BACKUP_MODEL, temperature=0.8, max_tokens=1024):
     try:
         gemini_messages = []
@@ -434,7 +429,6 @@ async def get_gemini_response(messages, model=GEMINI_BACKUP_MODEL, temperature=0
     except Exception as e:
         print(f"Erro na API Gemini (modelo: {model}): {e}")
         raise e
-
 async def get_llm_response(messages, model=MAIN_MODEL, temperature=0.8, max_tokens=1024, is_proactive=False):
     try:
         response = await get_openrouter_response(messages, model, temperature, max_tokens)
@@ -447,7 +441,6 @@ async def get_llm_response(messages, model=MAIN_MODEL, temperature=0.8, max_toke
         except Exception as gemini_error:
             print(f"Todos os modelos de LLM falharam:\n - OpenRouter: {openrouter_error}\n - Gemini: {gemini_error}")
             return None
-
 # --- MEMÓRIA PERMANENTE (ATUALIZADO: Chaves numéricas) ---
 def carregar_memoria_permanente():
     try:
@@ -471,11 +464,9 @@ def carregar_memoria_permanente():
             return data
     except (FileNotFoundError, json.JSONDecodeError):
         return {"users": {}, "topics": {}, "fallback_users": {}}
-
 def salvar_memoria_permanente(memoria):
     with open(PERMANENT_MEMORY_FILE, 'w', encoding='utf-8') as f:
         json.dump(memoria, f, ensure_ascii=False, indent=4)
-
 # --- ESTADO DE CONVERSA ---
 def carregar_estado_conversa():
     try:
@@ -492,22 +483,18 @@ def carregar_estado_conversa():
             "last_speak_authorization": None,
             "last_self_initiated_message_timestamp": None
         }
-
 def salvar_estado_conversa(estado):
     with open(CONVERSATION_STATE_FILE, 'w', encoding='utf-8') as f:
         json.dump(estado, f, ensure_ascii=False, indent=4)
-
 def carregar_mensagens_agendadas():
     try:
         with open(SCHEDULED_MESSAGES_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {"scheduled_messages": []}
-
 def salvar_mensagens_agendadas(agendadas):
     with open(SCHEDULED_MESSAGES_FILE, 'w', encoding='utf-8') as f:
         json.dump(agendadas, f, ensure_ascii=False, indent=4)
-
 def update_permanent_memory(memoria, new_facts):
     """Atualiza a memória permanente com novos fatos, edições ou remoções. Usa IDs numéricos como chaves."""
     if not new_facts:
@@ -634,7 +621,6 @@ def update_permanent_memory(memoria, new_facts):
         salvar_memoria_permanente(memoria)
         print("[Memória] ✓ Atualizado!")
     return updated
-
 def extract_json_from_response(response_text):
     if not response_text: return None
     json_block_match = re.search(r'```json\s*({.*?})\s*```', response_text, re.DOTALL)
@@ -644,7 +630,6 @@ def extract_json_from_response(response_text):
     json_match = re.search(r'{\s*".*?}\s*}', response_text, re.DOTALL)
     if json_match: return json_match.group(0)
     return response_text
-
 async def get_reply_context(message):
     """Extrai o contexto de uma mensagem que está respondendo outra."""
     reply_context = ""
@@ -663,7 +648,6 @@ Mensagem de resposta atual:
 - ID da mensagem original (para reply futuro): {replied_msg.id}
 """
     return reply_context
-
 # --- LÓGICA PRINCIPAL DO BOT (EVENTOS) ---
 @client.event
 async def on_ready():
@@ -672,7 +656,6 @@ async def on_ready():
     print('------')
     proactive_thought_loop.start()
     scheduled_messages_loop.start()
-
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -759,7 +742,6 @@ async def on_message(message):
                     print(f"[#{CANAL_CONVERSA}] target_user_id inválido: {target_user_id}")
            
             sent_msg = None
-            # CORREÇÃO: Só usar reply se reply_to_id for especificado
             if reply_to_id:
                 try:
                     msg_to_reply = await message.channel.fetch_message(int(reply_to_id))
@@ -767,7 +749,6 @@ async def on_message(message):
                 except:
                     sent_msg = await message.channel.send(response_text)
             else:
-                # Enviar mensagem normal em vez de reply
                 sent_msg = await message.channel.send(response_text)
            
             print(f"[#{CANAL_CONVERSA}] Sarah respondeu: {response_text}")
@@ -789,7 +770,6 @@ async def on_message(message):
                             except ValueError:
                                 pass
                        
-                        # CORREÇÃO: Só usar reply se fu_reply for especificado
                         if fu_reply:
                             try:
                                 msg_fu_reply = await message.channel.fetch_message(int(fu_reply))
@@ -814,7 +794,6 @@ async def on_message(message):
         print(f"[#{CANAL_CONVERSA}] Erro ao processar: {e}")
         async with message.channel.typing():
             await message.channel.send(resposta_llm_raw)
-
 # --- Loop de pensamento proativo (adaptado similarmente) ---
 @tasks.loop(minutes=PROACTIVE_LOOP_MINUTES)
 async def proactive_thought_loop():
@@ -893,7 +872,6 @@ async def proactive_thought_loop():
                         response_text = f"{member.mention} {response_text}"
                 except: pass
            
-            # CORREÇÃO: Só usar reply se reply_id for especificado
             if reply_id:
                 try:
                     msg_r = await target_channel.fetch_message(int(reply_id))
@@ -901,7 +879,6 @@ async def proactive_thought_loop():
                 except:
                     await target_channel.send(response_text)
             else:
-                # Enviar mensagem normal em vez de reply
                 await target_channel.send(response_text)
            
             estado_conversa["last_self_initiated_message_timestamp"] = datetime.now(brasilia_tz).isoformat()
@@ -921,8 +898,6 @@ async def proactive_thought_loop():
                                     fu_t = f"{m.mention} {fu_t}"
                             except: pass
                         fu_reply = fu.get("reply_to_message_id")
-                        
-                        # CORREÇÃO: Só usar reply se fu_reply for especificado
                         if fu_reply:
                             try:
                                 await target_channel.fetch_message(int(fu_reply)).reply(fu_t)
@@ -940,7 +915,6 @@ async def proactive_thought_loop():
                 salvar_mensagens_agendadas(ag)
     except Exception as e:
         print(f"[Proativo] Erro: {e}")
-
 # --- Loop agendadas (mesmo, com menção moderada) ---
 @tasks.loop(minutes=1)
 async def scheduled_messages_loop():
@@ -977,7 +951,6 @@ async def scheduled_messages_loop():
    
     agendadas["scheduled_messages"] = remaining
     salvar_mensagens_agendadas(agendadas)
-
 # --- EXECUÇÃO ---
 if __name__ == "__main__":
     if not DISCORD_TOKEN or not OPENROUTER_API_KEY or not GEMINI_API_KEY:
