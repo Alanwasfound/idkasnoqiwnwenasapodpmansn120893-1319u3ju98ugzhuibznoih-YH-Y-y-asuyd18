@@ -1143,7 +1143,7 @@ async def on_ready():
     scheduled_messages_loop.start()
 @client.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == client.user and message.channel.name != CANAL_CONVERSA:
         return
    
     user_id = str(message.author.id)
