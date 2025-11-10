@@ -18,7 +18,7 @@ load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-CANAL_CONVERSA = "💬𝕡𝕒𝕡𝕠-𝕡𝕒𝕡𝕠𝕤𝕠"
+CANAL_CONVERSA = "testes"
 PERMANENT_MEMORY_FILE = "permanent_memory.json"
 CONVERSATION_STATE_FILE = "conversation_state.json"
 SCHEDULED_MESSAGES_FILE = "scheduled_messages.json"
