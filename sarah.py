@@ -6,7 +6,7 @@ import requests
 import urllib.parse
 import uuid
 import random
-import asyncio
+import asyncio_
 import google.generativeai as genai
 from dotenv import load_dotenv
 from collections import deque
@@ -1145,7 +1145,7 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
        return
-    if amessage.channel.name != CANAL_CONVERSA:
+    if message.channel.name != CANAL_CONVERSA:
        return
    
     user_id = str(message.author.id)
