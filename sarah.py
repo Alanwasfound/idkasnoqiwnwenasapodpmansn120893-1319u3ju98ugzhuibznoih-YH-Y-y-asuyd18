@@ -60,10 +60,10 @@ CONTEXT_WINDOW_MESSAGES = 100
 PROACTIVE_LOOP_MINUTES = 10
 MINIMUM_IDLE_SECONDS = 3600 * 1
 SELF_INITIATED_COOLDOWN_SECONDS = 3600 * 4
-#MAIN_MODEL = "deepseek/deepseek-v3.2-exp"
-#PROACTIVE_MODELS = ["deepseek/deepseek-v3.2-exp"]
-MAIN_MODEL = "google/gemma-3-27b-it:free"
-PROACTIVE_MODELS = ["google/gemma-3-27b-it:free"]
+MAIN_MODEL = "deepseek/deepseek-v3.2-exp"
+PROACTIVE_MODELS = ["deepseek/deepseek-v3.2-exp"]
+#MAIN_MODEL = "google/gemma-3-27b-it:free"
+#PROACTIVE_MODELS = ["google/gemma-3-27b-it:free"]
 GEMINI_BACKUP_MODEL = "gemini-2.0-flash"
 
 # --- SYSTEM PROMPTS ---
